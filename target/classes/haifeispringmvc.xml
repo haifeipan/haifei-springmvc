@@ -2,5 +2,5 @@
 
 <beans>
     <!--specify the basic package and its subpackage we can to scan where the java classes are located-->
-    <component-scan base-package="com.haifeiedu.controller"></component-scan>
+    <component-scan base-package="com.haifeiedu.controller,com.haifeiedu.service"></component-scan>
 </beans>
