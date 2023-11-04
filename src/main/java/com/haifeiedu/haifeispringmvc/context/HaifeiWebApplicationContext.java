@@ -1,6 +1,7 @@
 package com.haifeiedu.haifeispringmvc.context;
 
 import com.haifeiedu.haifeispringmvc.annotation.Controller;
+import com.haifeiedu.haifeispringmvc.annotation.Service;
 import com.haifeiedu.haifeispringmvc.xml.XMLParser;
 
 import java.io.File;
@@ -95,13 +96,32 @@ public class HaifeiWebApplicationContext {
         try {
             for (String classFullPath : classFullPathList) {
                 Class<?> clazz = Class.forName(classFullPath);
+                // handle controller annotation
                 if(clazz.isAnnotationPresent(Controller.class)) {
                     String beanName = clazz.getSimpleName().substring(0, 1).toLowerCase() +
                             clazz.getSimpleName().substring(1);
                     ioc.put(beanName, clazz.newInstance());
+                    // handle Service annotation
+                } else if (clazz.isAnnotationPresent(Service.class)) {
+                    Service serviceAnnotation = clazz.getAnnotation(Service.class);
+                    //
+                    String beanName = serviceAnnotation.value();
+                    if ("".equals(beanName)) {
+                        System.out.println("beanName == null");
+                        Class<?>[] interfaces = clazz.getInterfaces();
+                        Object instance = clazz.newInstance();
+                        for (Class<?> anInterface : interfaces) {
+                            String beanName2 = anInterface.getSimpleName().substring(0,1).toLowerCase() + anInterface.getSimpleName().substring(1);
+                            ioc.put(beanName2, instance);
+                        }
+                        // if we want to use class name (first letter lowercase) to inject bean
+                        // we can use clazz.
+                    } else {
+                        ioc.put(beanName, clazz.newInstance());
+                    }
+
                 }
 
-                // if we have more annotations, we can add more code. But here we just code a demo.
             }
         } catch (Exception e) {
             e.printStackTrace();
