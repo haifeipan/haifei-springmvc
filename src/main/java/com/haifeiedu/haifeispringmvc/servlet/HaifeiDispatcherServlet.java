@@ -5,6 +5,7 @@ import com.haifeiedu.haifeispringmvc.annotation.RequestMapping;
 import com.haifeiedu.haifeispringmvc.context.HaifeiWebApplicationContext;
 import com.haifeiedu.haifeispringmvc.handler.HaifeiHandler;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +26,21 @@ public class HaifeiDispatcherServlet extends HttpServlet {
     private List<HaifeiHandler> handlerList = new ArrayList<>();
     HaifeiWebApplicationContext haifeiWebApplicationContext = null;
     @Override
-    public void init() throws ServletException {
-        haifeiWebApplicationContext = new HaifeiWebApplicationContext();
+    public void init(ServletConfig servletConfig) throws ServletException {
+
+        // get the contextConfigLocation from web.xml
+
+        /**
+         *
+         *     <init-param>
+         *       <param-name>contextConfigLocation</param-name>
+         *       <param-value>classpath:haifeispringmvc.xml</param-value>
+         *     </init-param>
+         *
+         */
+        String configLocation = servletConfig.getInitParameter("contextConfigLocation");
+
+        haifeiWebApplicationContext = new HaifeiWebApplicationContext(configLocation);
         haifeiWebApplicationContext.init();
         initHandlerMapping();
         System.out.println("handlerList = " + handlerList);

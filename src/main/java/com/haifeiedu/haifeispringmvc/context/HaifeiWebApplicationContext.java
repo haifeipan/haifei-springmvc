@@ -18,11 +18,22 @@ public class HaifeiWebApplicationContext {
     public ConcurrentHashMap<String, Object> ioc = new ConcurrentHashMap<>();
     // pay attention Object V.S Objects
 
+
+    // define configLocation, used to store the location of springmvc configuration file
+    private String configLocation;
+
+    public HaifeiWebApplicationContext() {
+    }
+
+    public HaifeiWebApplicationContext(String configLocation) {
+        this.configLocation = configLocation;
+    }
+
     /**
      * This method is used to finish the initiation of spring container.
      */
     public void init() {
-        String basePackage = XMLParser.getBasePackage("haifeispringmvc.xml");
+        String basePackage = XMLParser.getBasePackage(configLocation.split(":")[1]);
 //        scanPackage(basePackage);
         String[] basePackages = basePackage.split(",");
         if (basePackages.length > 0) {
