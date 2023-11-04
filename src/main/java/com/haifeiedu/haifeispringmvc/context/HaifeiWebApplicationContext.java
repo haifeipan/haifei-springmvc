@@ -1,13 +1,16 @@
 package com.haifeiedu.haifeispringmvc.context;
 
+import com.haifeiedu.haifeispringmvc.annotation.AutoWired;
 import com.haifeiedu.haifeispringmvc.annotation.Controller;
 import com.haifeiedu.haifeispringmvc.annotation.Service;
 import com.haifeiedu.haifeispringmvc.xml.XMLParser;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +47,9 @@ public class HaifeiWebApplicationContext {
         }
         System.out.println("classFullPathList = " + classFullPathList);
         executeInstance();
-        System.out.println("ioc container = " + ioc);
+        System.out.println("ioc container after scanning = " + ioc);
+        executeAutoWired();
+        System.out.println("ioc container after scanning and autowired = " + ioc);
     }
 
     /**
@@ -126,5 +131,54 @@ public class HaifeiWebApplicationContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * The method is used to finish the filed AutoWired in IOC
+     */
+    public void executeAutoWired() {
+        // if the ioc is empty, it means it doesn't have any bean in the ioc, it is not necessary to wire
+        if (ioc.isEmpty()) {
+            // or we can throw exception
+            // throw new RuntimeException("ioc container doesn't have bean objects")
+            return;
+        }
+
+        //iterate each bean object in the IOC container, get all the fileds of the bean, check if it is needed to auto wired
+        for (Map.Entry<String, Object> entry : ioc.entrySet()) {
+            Object bean = entry.getValue();
+
+            Field[] declaredFields = bean.getClass().getDeclaredFields();
+            // iterate each field in this bean
+            for (Field field : declaredFields) {
+                // check if this field needed to auto wired
+                if(field.isAnnotationPresent(AutoWired.class)) {
+                    AutoWired autoWiredAnnotation = field.getAnnotation(AutoWired.class);
+                    String beanName = autoWiredAnnotation.value();
+
+                    // if the AutoWired Annotation doesn't have value,
+                    // we use the field type(class) as the beanName we want to search in IOC
+                    if("".equals(beanName)) {
+                        beanName = field.getType().getSimpleName().substring(0, 1).toLowerCase() +
+                                field.getType().getSimpleName().substring(1);
+                    }
+
+                    if(null == ioc.get(beanName)) {
+                        throw new RuntimeException("In this IOC, there is not the bean you want to wire");
+                    }
+
+                    // If we want to access Private Field and method using Reflection
+                    // we just need to call setAccessible(true) on the field or method object which you want to access.
+                    field.setAccessible(true);
+                    try {
+                        field.set(bean, ioc.get(beanName));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+
+
     }
 }
