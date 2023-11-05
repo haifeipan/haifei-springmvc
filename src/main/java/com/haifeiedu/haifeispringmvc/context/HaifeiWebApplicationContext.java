@@ -112,7 +112,6 @@ public class HaifeiWebApplicationContext {
                     //
                     String beanName = serviceAnnotation.value();
                     if ("".equals(beanName)) {
-                        System.out.println("beanName == null");
                         Class<?>[] interfaces = clazz.getInterfaces();
                         Object instance = clazz.newInstance();
                         for (Class<?> anInterface : interfaces) {

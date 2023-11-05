@@ -17,4 +17,29 @@ public class MonsterServiceImpl implements MonsterService {
         monsters.add(new Monster(200, "old cat", "catch mouses", 400));
         return monsters;
     }
+
+    @Override
+    public List<Monster> findMonsterByName(String name) {
+        List<Monster> monsters = new ArrayList<>();
+        monsters.add(new Monster(100, "cow king", "balance umbrella", 400));
+        monsters.add(new Monster(200, "old cat", "catch mouses", 200));
+        monsters.add(new Monster(300, "elephant man", "carry wood", 100));
+        monsters.add(new Monster(400, "yellow cloth", "smoke", 300));
+        monsters.add(new Monster(500, "bai man", "beauty method", 800));
+
+        List<Monster> monstersFound = new ArrayList<>();
+        for (Monster monster : monsters) {
+            if (monster.getName().contains(name)) {
+                monstersFound.add(monster);
+            }
+        }
+        return monstersFound;
+    }
+
+    @Override
+    public boolean login(String name) {
+        return false;
+    }
+
+
 }
