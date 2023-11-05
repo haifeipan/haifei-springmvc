@@ -158,7 +158,7 @@ public class HaifeiDispatcherServlet extends HttpServlet {
                         parameters[i] = response;
                     }
                 }
-
+                request.setCharacterEncoding("utf-8");
                 Map<String, String[]> parameterMap = request.getParameterMap();
                 for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                     String name = entry.getKey();
@@ -192,8 +192,27 @@ public class HaifeiDispatcherServlet extends HttpServlet {
 
 
                 // haifeiHandler.getMethod().invoke(haifeiHandler.getController(), request, response);
-                haifeiHandler.getMethod().invoke(haifeiHandler.getController(), parameters);
 
+
+                Object result = haifeiHandler.getMethod().invoke(haifeiHandler.getController(), parameters);
+
+                //In here, we need to parse the result from reflection invoke(). In original SpringMVC, it is finished by view resolver.
+                //we directly parse the result in here, don't use view resolver. just a demo to help you understand how to parse the result
+
+                if (result instanceof String) {
+                    String viewName = (String) result;
+                    if (viewName.contains(":")) {
+                        String way = viewName.split(":")[0];
+                        String page = viewName.split(":")[1];
+                        if ("forward".equals(way)) {
+                            request.getRequestDispatcher(page).forward(request, response);
+                        } else if ("redirect".equals(way)) {
+                            response.sendRedirect(page);
+                        }
+                    } else {
+                        request.getRequestDispatcher(viewName).forward(request, response);
+                    }
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

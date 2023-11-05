@@ -38,6 +38,11 @@ public class MonsterServiceImpl implements MonsterService {
 
     @Override
     public boolean login(String name) {
+
+        // in actual situation, we will go to database to validate.
+        if ("white sprite".equals(name)) {
+            return true;
+        }
         return false;
     }
 

@@ -77,4 +77,23 @@ public class MonsterController {
             throw new RuntimeException(e);
         }
     }
+
+    @RequestMapping(value = "/monster/login")
+    public String login(HttpServletRequest request, HttpServletResponse response, String mName) {
+        System.out.println("nName accepted: " + mName);
+        boolean b = monsterService.login(mName);
+        request.setAttribute("mName", mName);
+        if (b) {
+//             demo forward
+//
+//             return "forward:/login_ok.jsp";
+//
+//             demo redirect
+//             return "redirect:/login_ok.jsp";
+
+            return "/login_ok.jsp";
+        } else {
+            return "forward:/login_error.jsp";
+        }
+    }
 }
