@@ -11,4 +11,5 @@ public interface MonsterService {
     List<Monster> findMonsterByName(String name);
 
     boolean login(String name);
+
 }

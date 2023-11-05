@@ -1,9 +1,7 @@
 package com.haifeiedu.haifeispringmvc.servlet;
 
-import com.haifeiedu.haifeispringmvc.annotation.AutoWired;
-import com.haifeiedu.haifeispringmvc.annotation.Controller;
-import com.haifeiedu.haifeispringmvc.annotation.RequestMapping;
-import com.haifeiedu.haifeispringmvc.annotation.RequetsParam;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.haifeiedu.haifeispringmvc.annotation.*;
 import com.haifeiedu.haifeispringmvc.context.HaifeiWebApplicationContext;
 import com.haifeiedu.haifeispringmvc.handler.HaifeiHandler;
 
@@ -13,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -211,6 +210,25 @@ public class HaifeiDispatcherServlet extends HttpServlet {
                         }
                     } else {
                         request.getRequestDispatcher(viewName).forward(request, response);
+                    }
+                } else if (result instanceof ArrayList) {
+                    Method method = haifeiHandler.getMethod();
+
+                    // check if the target method has @ResponseBody
+                    boolean responseBodyPresent = method.isAnnotationPresent(ResponseBody.class);
+                    if (responseBodyPresent) {
+
+                        // convert result (ArrayList) into json format
+                        // we use jackson package to convert it
+
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        String resultJson = objectMapper.writeValueAsString(result);
+
+                        response.setContentType("text/html;charset=utf-8");
+                        PrintWriter writer = response.getWriter();
+                        writer.write(resultJson);
+                        writer.flush();
+                        writer.close();
                     }
                 }
             }

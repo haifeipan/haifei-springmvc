@@ -1,16 +1,14 @@
 package com.haifeiedu.controller;
 
 import com.haifeiedu.entity.Monster;
-import com.haifeiedu.haifeispringmvc.annotation.AutoWired;
-import com.haifeiedu.haifeispringmvc.annotation.Controller;
-import com.haifeiedu.haifeispringmvc.annotation.RequestMapping;
-import com.haifeiedu.haifeispringmvc.annotation.RequetsParam;
+import com.haifeiedu.haifeispringmvc.annotation.*;
 import com.haifeiedu.service.MonsterService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -95,5 +93,20 @@ public class MonsterController {
         } else {
             return "forward:/login_error.jsp";
         }
+    }
+
+    /**
+     * @param request
+     * @param response
+     * @return
+     *
+     * 1. The result returned by this method is given to SpringMVC where the reflection invoke happens
+     * 2. we accept the result and handle it in SpringMVC fundamental layer.
+     */
+    @RequestMapping(value = "/monster/list/json")
+    @ResponseBody
+    public List<Monster> findMonsterByJson(HttpServletRequest request, HttpServletResponse response) {
+        List<Monster> monsters = monsterService.listMonster();
+        return monsters;
     }
 }
